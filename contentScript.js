@@ -1,19 +1,17 @@
 console.log('contentScript.js');
-chrome.runtime.onMessage.addListener((request, sender, senRes) => {
-    const metaElm = document.querySelector('meta[name="google-site-verification"]');
-    if (metaElm) {
-        const pElm = metaElm.parentElement;
-        const imagesElm = pElm.querySelectorAll('img[referrerpolicy="origin-when-cross-origin"]');
-
-        if (imagesElm.length > 0) {
-            imagesElm.forEach((image) => {
-                const srcAtt = image.getAttribute('src');
-                // images.push({ src: srcAtt, name: getName(srcAtt) });
-                downloadImage(srcAtt, getName(srcAtt));
-            });
-            senRes({ response: 'Downloaded' });
-
-        }
+chrome.runtime.onMessage.addListener((request, sender, sendRes) => {
+    const imagesElm = document.querySelectorAll('img[referrerpolicy="origin-when-cross-origin"]');
+    if (imagesElm.length > 0) {
+        const imagesSrc = [];
+        imagesElm.forEach((image) => {
+            const srcAtt = image.getAttribute('src');
+            if(!imagesSrc.includes(srcAtt)) 
+            imagesSrc.push(srcAtt);
+        });
+        imagesSrc.forEach(imageSrc => {
+            downloadImage(imageSrc, getName(imageSrc));
+        })
+        sendRes({ response: 'Downloaded' });
     }
 });
 
